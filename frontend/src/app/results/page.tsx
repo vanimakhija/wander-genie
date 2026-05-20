@@ -7,7 +7,7 @@ import ItineraryCard from '@/components/ItineraryCard'
 import PackingList from '@/components/PackingList'
 import WeatherCard from '@/components/WeatherCard'
 import ShareModal from '@/components/ShareModal'
-import { ArrowLeft, Map, Backpack, Download, Share2, MapPin, Calendar, DollarSign, Loader2 } from 'lucide-react'
+import { ArrowLeft, Map, Backpack, Download, Share2, MapPin, Calendar, Loader2 } from 'lucide-react'
 import {
   TRIP_STORAGE_KEY,
   FORM_STORAGE_KEY,
@@ -209,10 +209,10 @@ export default function ResultsPage() {
               {[
                 { icon: MapPin,      label: 'Destination', value: form?.destination,                      color: 'text-brand-400' },
                 { icon: Calendar,    label: 'Duration',    value: `${form?.duration} days`,               color: 'text-indigo-400' },
-                { icon: DollarSign,  label: 'Budget',      value: `₹${Number(form?.budget).toLocaleString('en-IN')}`, color: 'text-yellow-400' },
+                { icon: null,        label: 'Budget',      value: `₹${Number(form?.budget).toLocaleString('en-IN')}`, color: 'text-yellow-400' },
               ].map(({ icon: I, label, value, color }) => (
                 <div key={label} className="flex items-center gap-2">
-                  <I className={`h-4 w-4 ${color}`} strokeWidth={1.5} />
+                  {I && <I className={`h-4 w-4 ${color}`} strokeWidth={1.5} />}
                   <div>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">{label}</p>
                     <p className="text-sm font-semibold capitalize text-white">{value}</p>

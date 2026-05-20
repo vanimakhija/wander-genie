@@ -119,14 +119,13 @@ export default function TripForm({ onSubmit, isLoading }: Props) {
                 Budget (₹)
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-400" />
                 <input
                   type="number"
                   placeholder="e.g. 20000"
                   min={1}
                   value={form.budget}
                   {...field('budget')}
-                  className={`input-base w-full rounded-xl py-3.5 pl-10 pr-4 text-sm ${errors.budget ? 'border-red-500/60' : ''}`}
+                  className={`input-base w-full rounded-xl py-3.5 px-4 text-sm ${errors.budget ? 'border-red-500/60' : ''}`}
                 />
               </div>
               {errors.budget && <p className="mt-1.5 text-xs text-red-400">{errors.budget}</p>}
