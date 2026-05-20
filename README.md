@@ -49,7 +49,7 @@ wander-genie-fullstack/
 
 
 ## WanderGenie AI Travel Planner
-
+##Built with Next.js and FastAPI
 ### Prerequisites
 - **Node.js 18+** — https://nodejs.org
 - **Python 3.11+** — https://python.org
