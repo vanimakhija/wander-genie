@@ -47,6 +47,9 @@ wander-genie-fullstack/
 
 ## 🚀 Quick Start (Recommended)
 
+
+## WanderGenie AI Travel Planner
+
 ### Prerequisites
 - **Node.js 18+** — https://nodejs.org
 - **Python 3.11+** — https://python.org
