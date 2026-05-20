@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { MapPin, DollarSign, Calendar, Zap, ChevronRight } from 'lucide-react'
+import { MapPin, DollarSign, Calendar, Zap, ChevronRight, CalendarDays } from 'lucide-react'
 import type { TripRequest } from '@/lib/types'
 
 const INTERESTS = [
@@ -16,6 +16,11 @@ const INTERESTS = [
   { id: 'photography', emoji: '📸', label: 'Photography' },
 ]
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
 interface Props {
   onSubmit: (data: TripRequest) => void
   isLoading: boolean
@@ -25,20 +30,29 @@ interface FormState {
   destination: string
   budget: string
   duration: string
+  travel_month: string
   interests: string[]
 }
 
 export default function TripForm({ onSubmit, isLoading }: Props) {
-  const [form, setForm] = useState<FormState>({ destination: '', budget: '', duration: '', interests: [] })
+  const currentMonth = MONTHS[new Date().getMonth()]
+  const [form, setForm] = useState<FormState>({
+    destination: '',
+    budget: '',
+    duration: '',
+    travel_month: currentMonth,
+    interests: [],
+  })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
 
   const validate = () => {
     const e: typeof errors = {}
-    if (!form.destination.trim())         e.destination = 'Please enter a destination'
-    if (!form.budget || +form.budget <= 0) e.budget = 'Enter a valid budget'
+    if (!form.destination.trim())          e.destination    = 'Please enter a destination'
+    if (!form.budget || +form.budget <= 0) e.budget         = 'Enter a valid budget'
     if (!form.duration || +form.duration < 1 || +form.duration > 30)
-      e.duration = '1–30 days allowed'
-    if (!form.interests.length)           e.interests = 'Pick at least one interest'
+                                           e.duration       = '1–30 days allowed'
+    if (!form.travel_month)                e.travel_month   = 'Select a travel month'
+    if (!form.interests.length)            e.interests      = 'Pick at least one interest'
     setErrors(e)
     return !Object.keys(e).length
   }
@@ -56,7 +70,13 @@ export default function TripForm({ onSubmit, isLoading }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validate()) {
-      onSubmit({ destination: form.destination.trim(), budget: +form.budget, duration: +form.duration, interests: form.interests })
+      onSubmit({
+        destination:   form.destination.trim(),
+        budget:        +form.budget,
+        duration:      +form.duration,
+        travel_month:  form.travel_month,
+        interests:     form.interests,
+      })
     }
   }
 
@@ -70,10 +90,10 @@ export default function TripForm({ onSubmit, isLoading }: Props) {
   return (
     <form onSubmit={handleSubmit} className="animate-fade-up delay-500 mx-auto w-full max-w-2xl">
       <div className="glass-strong grad-border relative overflow-hidden rounded-2xl p-6 shadow-glass sm:p-8">
-        {/* Inner glow */}
         <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-500/5 via-transparent to-indigo-500/5" />
 
         <div className="relative space-y-6">
+
           {/* Destination */}
           <div>
             <label className="mb-2 block font-mono text-[11px] font-medium uppercase tracking-widest text-white/40">
@@ -129,6 +149,40 @@ export default function TripForm({ onSubmit, isLoading }: Props) {
               </div>
               {errors.duration && <p className="mt-1.5 text-xs text-red-400">{errors.duration}</p>}
             </div>
+          </div>
+
+          {/* Travel Month */}
+          <div>
+            <label className="mb-2 block font-mono text-[11px] font-medium uppercase tracking-widest text-white/40">
+              Travel Month
+            </label>
+            <div className="relative">
+              <CalendarDays className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-400 pointer-events-none z-10" />
+              <select
+                value={form.travel_month}
+                onChange={(e) => {
+                  setForm((p) => ({ ...p, travel_month: e.target.value }))
+                  if (errors.travel_month) setErrors((er) => ({ ...er, travel_month: undefined }))
+                }}
+                className={`input-base w-full rounded-xl py-3.5 pl-10 pr-4 text-sm appearance-none cursor-pointer ${errors.travel_month ? 'border-red-500/60' : ''}`}
+              >
+                {MONTHS.map((month) => (
+                  <option key={month} value={month} className="bg-[#0d1b3e] text-white">
+                    {month}
+                  </option>
+                ))}
+              </select>
+              {/* Dropdown arrow */}
+              <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2">
+                <svg className="h-4 w-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            {errors.travel_month && <p className="mt-1.5 text-xs text-red-400">{errors.travel_month}</p>}
+            <p className="mt-1.5 text-[11px] text-white/25">
+              Helps us give accurate weather & packing recommendations
+            </p>
           </div>
 
           {/* Interests */}

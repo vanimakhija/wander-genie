@@ -5,6 +5,7 @@ export interface TripRequest {
   budget: number
   duration: number
   interests: string[]
+  travel_month: string   // e.g. "January", "June"
 }
 
 export interface ItineraryDay {

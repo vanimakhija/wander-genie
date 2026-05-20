@@ -3,59 +3,54 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
-# ── Request ───────────────────────────────────────────────────────────────────
-
 class TripRequest(BaseModel):
-    destination: str = Field(..., min_length=1, max_length=100, example="Goa")
-    budget: float    = Field(..., gt=0, example=20000)
-    duration: int    = Field(..., ge=1, le=30, example=5)
-    interests: List[str] = Field(..., min_length=1, example=["beaches", "cafes"])
+    destination: str  = Field(..., min_length=1, max_length=100, example="Goa")
+    budget:      float = Field(..., gt=0, example=20000)
+    duration:    int   = Field(..., ge=1, le=30, example=5)
+    interests:   List[str] = Field(..., min_length=1, example=["beaches", "cafes"])
+    travel_month: str = Field(default="June", example="December")
 
-
-# ── Response ──────────────────────────────────────────────────────────────────
 
 class MealPlan(BaseModel):
     breakfast: str
-    lunch: str
-    dinner: str
+    lunch:     str
+    dinner:    str
 
 
 class ItineraryDay(BaseModel):
-    day: int
-    title: str
+    day:        int
+    title:      str
     activities: List[str]
-    meals: Optional[MealPlan] = None
-    tips: Optional[str] = None
+    meals:      Optional[MealPlan] = None
+    tips:       Optional[str]      = None
 
 
 class PackingSection(BaseModel):
-    name: str
+    name:  str
     items: List[str]
 
 
 class WeatherInfo(BaseModel):
-    temperature: str
-    condition: str
-    rainPrediction: str
-    suggestion: str
-    humidity: Optional[str] = None
-    icon: Optional[str] = None   # "sunny" | "cloudy" | "rainy" | "hot"
+    temperature:   str
+    condition:     str
+    rainPrediction:str
+    suggestion:    str
+    humidity:      Optional[str] = None
+    icon:          Optional[str] = None
 
 
 class TripResponse(BaseModel):
-    destination: str
-    itinerary: List[ItineraryDay]
+    destination:  str
+    itinerary:    List[ItineraryDay]
     packing_list: List[PackingSection]
-    weather: WeatherInfo
+    weather:      WeatherInfo
 
-
-# ── Share ─────────────────────────────────────────────────────────────────────
 
 class ShareTripPayload(BaseModel):
-    form: TripRequest
+    form:   TripRequest
     result: TripResponse
 
 
 class ShareLinkResponse(BaseModel):
-    share_id: str
+    share_id:   str
     share_path: str
