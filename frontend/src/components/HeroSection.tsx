@@ -1,14 +1,24 @@
 'use client'
+import Image from 'next/image'
 
 export default function HeroSection() {
   return (
     <div className="mb-10 text-center sm:mb-14">
-      {/* Badge */}
-      <div className="animate-fade-up delay-100 mb-6 inline-flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-500/10 px-4 py-2">
-        <span>✨</span>
-        <span className="font-mono text-xs font-medium tracking-widest text-brand-300 uppercase">
-          AI Travel Intelligence
-        </span>
+      {/* Logo */}
+      <div className="animate-fade-up delay-100 mb-8 inline-flex items-center justify-center">
+        <div className="group relative h-32 w-32 transition-all duration-300 hover:scale-110">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-brand-400/20 to-indigo-500/20 blur-xl transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-brand-400/40 group-hover:to-indigo-500/40" />
+          <div className="relative flex h-full w-full items-center justify-center rounded-full border border-brand-400/30 bg-brand-500/5 backdrop-blur transition-all duration-300 group-hover:border-brand-400/60 group-hover:bg-brand-500/10">
+            <Image
+              src="/logo.png"
+              alt="WanderGenie Logo"
+              width={128}
+              height={128}
+              className="h-28 w-28 transition-transform duration-300 group-hover:scale-110"
+              priority
+            />
+          </div>
+        </div>
       </div>
 
       {/* Headline */}
@@ -18,8 +28,6 @@ export default function HeroSection() {
       >
         Plan Your{' '}
         <span className="gradient-text">Dream Trip</span>
-        <br />
-        <span className="text-white">with AI</span>
       </h1>
 
       {/* Subtitle */}
@@ -27,22 +35,6 @@ export default function HeroSection() {
         Enter your destination and preferences. Get a personalized day-by-day
         itinerary and weather-aware packing list in seconds.
       </p>
-
-      {/* Social proof */}
-      <div className="animate-fade-up delay-400 mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-        {[
-          { value: '10K+', label: 'Trips planned' },
-          { value: '120+', label: 'Destinations' },
-          { value: '4.9 ★', label: 'User rating' },
-        ].map(({ value, label }) => (
-          <div key={label} className="text-center">
-            <p className="gradient-text text-lg font-bold sm:text-xl" style={{ fontFamily: 'var(--font-display)' }}>
-              {value}
-            </p>
-            <p className="mt-0.5 text-xs text-white/30">{label}</p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

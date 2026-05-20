@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { MapPin, DollarSign, Calendar, Zap, ChevronRight, CalendarDays } from 'lucide-react'
+import { MapPin, DollarSign, Calendar, ChevronRight, CalendarDays } from 'lucide-react'
 import type { TripRequest } from '@/lib/types'
 
 const INTERESTS = [
@@ -228,7 +228,6 @@ export default function TripForm({ onSubmit, isLoading }: Props) {
               </>
             ) : (
               <>
-                <Zap className="h-4 w-4" />
                 Generate Trip
                 <ChevronRight className="h-4 w-4" />
               </>
