@@ -11,6 +11,7 @@ import { ArrowLeft, Map, Backpack, Download, Share2, MapPin, Calendar, DollarSig
 import {
   TRIP_STORAGE_KEY,
   FORM_STORAGE_KEY,
+  ApiError,
   createShareLink,
   fetchSharedTrip,
 } from '@/lib/api'
@@ -88,8 +89,12 @@ export default function ResultsPage() {
     try {
       const url = await createShareLink(form, result)
       setShareUrl(url)
-    } catch {
-      setActionError('Could not create share link. Make sure the backend is running.')
+    } catch (err) {
+      const msg =
+        err instanceof ApiError && err.status === 404
+          ? 'Share API missing — restart the backend (stop old terminal, run uvicorn again).'
+          : 'Could not create share link. Make sure the backend is running on port 8000.'
+      setActionError(msg)
     } finally {
       setSharing(false)
     }

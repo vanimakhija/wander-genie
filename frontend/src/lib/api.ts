@@ -173,7 +173,12 @@ export async function createShareLink(form: TripRequest, result: TripResponse): 
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new ApiError(text || `Share failed (${res.status})`, res.status)
+    throw new ApiError(
+      res.status === 404
+        ? 'Share endpoint not found (404) — restart backend with latest code.'
+        : text || `Share failed (${res.status})`,
+      res.status,
+    )
   }
 
   const data = (await res.json()) as ShareLinkResponse
