@@ -47,3 +47,15 @@ class TripResponse(BaseModel):
     itinerary: List[ItineraryDay]
     packing_list: List[PackingSection]
     weather: WeatherInfo
+
+
+# ── Share ─────────────────────────────────────────────────────────────────────
+
+class ShareTripPayload(BaseModel):
+    form: TripRequest
+    result: TripResponse
+
+
+class ShareLinkResponse(BaseModel):
+    share_id: str
+    share_path: str

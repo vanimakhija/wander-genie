@@ -21,7 +21,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from ai_service import generate_with_ai
-from schemas import TripRequest, TripResponse
+from schemas import ShareLinkResponse, ShareTripPayload, TripRequest, TripResponse
+from share_service import create_share, get_share
 
 load_dotenv()
 
@@ -127,3 +128,28 @@ async def generate_itinerary(req: TripRequest):
             status_code=500,
             detail="Failed to generate itinerary. Please try again."
         )
+
+
+@app.post(
+    "/share-trip",
+    response_model=ShareLinkResponse,
+    summary="Create a shareable link for a trip",
+    tags=["Share"],
+)
+async def share_trip(payload: ShareTripPayload):
+    share_id = create_share(payload)
+    logger.info("Share link created: %s for %s", share_id, payload.form.destination)
+    return ShareLinkResponse(share_id=share_id, share_path=f"/results?share={share_id}")
+
+
+@app.get(
+    "/share-trip/{share_id}",
+    response_model=ShareTripPayload,
+    summary="Load a shared trip by ID",
+    tags=["Share"],
+)
+async def load_shared_trip(share_id: str):
+    payload = get_share(share_id)
+    if payload is None:
+        raise HTTPException(status_code=404, detail="Share link not found or expired.")
+    return payload

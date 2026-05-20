@@ -148,3 +148,46 @@ export async function generateItinerary(request: TripRequest): Promise<TripRespo
 
 export const TRIP_STORAGE_KEY = 'wander-genie-trip'
 export const FORM_STORAGE_KEY = 'wander-genie-form'
+
+export interface ShareTripPayload {
+  form: TripRequest
+  result: TripResponse
+}
+
+export interface ShareLinkResponse {
+  share_id: string
+  share_path: string
+}
+
+export async function createShareLink(form: TripRequest, result: TripResponse): Promise<string> {
+  const payload: ShareTripPayload = {
+    form,
+    result: { ...result, destination: form.destination },
+  }
+
+  const res = await fetch(`${API_BASE}/share-trip`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new ApiError(text || `Share failed (${res.status})`, res.status)
+  }
+
+  const data = (await res.json()) as ShareLinkResponse
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  return `${origin}${data.share_path}`
+}
+
+export async function fetchSharedTrip(shareId: string): Promise<ShareTripPayload> {
+  const res = await fetch(`${API_BASE}/share-trip/${shareId}`)
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new ApiError(text || `Share not found (${res.status})`, res.status)
+  }
+
+  return (await res.json()) as ShareTripPayload
+}

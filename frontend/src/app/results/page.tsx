@@ -1,13 +1,20 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ItineraryCard from '@/components/ItineraryCard'
 import PackingList from '@/components/PackingList'
 import WeatherCard from '@/components/WeatherCard'
-import { ArrowLeft, Map, Backpack, Download, Share2, MapPin, Calendar, DollarSign } from 'lucide-react'
-import { TRIP_STORAGE_KEY, FORM_STORAGE_KEY } from '@/lib/api'
+import ShareModal from '@/components/ShareModal'
+import { ArrowLeft, Map, Backpack, Download, Share2, MapPin, Calendar, DollarSign, Loader2 } from 'lucide-react'
+import {
+  TRIP_STORAGE_KEY,
+  FORM_STORAGE_KEY,
+  createShareLink,
+  fetchSharedTrip,
+} from '@/lib/api'
+import { exportTripPdf } from '@/lib/exportPdf'
 import type { TripResponse, TripRequest } from '@/lib/types'
 
 const TABS = [
@@ -20,13 +27,92 @@ export default function ResultsPage() {
   const [result, setResult]   = useState<TripResponse | null>(null)
   const [form, setForm]       = useState<TripRequest | null>(null)
   const [tab, setTab]         = useState<'itinerary' | 'packing'>('itinerary')
+  const [loading, setLoading] = useState(true)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [sharing, setSharing] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  const persistTrip = useCallback((f: TripRequest, r: TripResponse) => {
+    sessionStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(r))
+    sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(f))
+    setForm(f)
+    setResult(r)
+  }, [])
 
   useEffect(() => {
-    const r = sessionStorage.getItem(TRIP_STORAGE_KEY)
-    const f = sessionStorage.getItem(FORM_STORAGE_KEY)
-    if (r) setResult(JSON.parse(r))
-    if (f) setForm(JSON.parse(f))
-  }, [])
+    const load = async () => {
+      const params = new URLSearchParams(window.location.search)
+      const shareId = params.get('share')
+
+      if (shareId) {
+        try {
+          const shared = await fetchSharedTrip(shareId)
+          persistTrip(shared.form, shared.result)
+        } catch {
+          setActionError('Share link not found or expired.')
+        } finally {
+          setLoading(false)
+        }
+        return
+      }
+
+      const r = sessionStorage.getItem(TRIP_STORAGE_KEY)
+      const f = sessionStorage.getItem(FORM_STORAGE_KEY)
+      if (r) setResult(JSON.parse(r))
+      if (f) setForm(JSON.parse(f))
+      setLoading(false)
+    }
+    load()
+  }, [persistTrip])
+
+  const handleExportPdf = () => {
+    if (!result || !form) return
+    setActionError(null)
+    setExporting(true)
+    try {
+      exportTripPdf(form, result)
+    } catch {
+      setActionError('Could not create PDF. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const handleShare = async () => {
+    if (!result || !form) return
+    setActionError(null)
+    setSharing(true)
+    setLinkCopied(false)
+    try {
+      const url = await createShareLink(form, result)
+      setShareUrl(url)
+    } catch {
+      setActionError('Could not create share link. Make sure the backend is running.')
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) return
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2500)
+    } catch {
+      setActionError('Copy failed — select the link and copy manually.')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-brand-400" />
+      </div>
+    )
+  }
 
   if (!result) {
     return (
@@ -34,7 +120,7 @@ export default function ResultsPage() {
         <div className="text-center">
           <p className="mb-2 text-5xl">🗺️</p>
           <h2 className="mb-4 text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-            No trip found
+            {actionError || 'No trip found'}
           </h2>
           <button onClick={() => router.push('/')} className="btn-primary flex items-center gap-2 rounded-xl px-6 py-3 text-sm mx-auto">
             <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -48,6 +134,15 @@ export default function ResultsPage() {
 
   return (
     <div className="relative min-h-screen">
+      {shareUrl && (
+        <ShareModal
+          url={shareUrl}
+          onClose={() => setShareUrl(null)}
+          copied={linkCopied}
+          onCopy={handleCopyLink}
+        />
+      )}
+
       {/* Background */}
       <div className="fixed inset-0" style={{ background: 'linear-gradient(135deg, #020817 0%, #0d1b3e 45%, #120e38 70%, #020c1f 100%)' }} />
       <div className="pointer-events-none fixed right-1/4 top-1/4 h-96 w-96 animate-glow rounded-full bg-indigo-500/6 blur-3xl" />
@@ -67,12 +162,28 @@ export default function ResultsPage() {
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
               Plan another trip
             </button>
-            <div className="flex gap-2">
-              {[{ icon: Share2, label: 'Share' }, { icon: Download, label: 'Export' }].map(({ icon: I, label }) => (
-                <button key={label} className="glass flex items-center gap-1.5 rounded-lg border border-white/8 px-3 py-2 text-xs text-white/45 transition-all hover:bg-white/8 hover:text-white/80">
-                  <I className="h-3.5 w-3.5" /> {label}
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={handleShare}
+                  disabled={sharing || !form}
+                  className="glass flex items-center gap-1.5 rounded-lg border border-white/8 px-3 py-2 text-xs text-white/45 transition-all hover:bg-white/8 hover:text-white/80 disabled:opacity-50"
+                >
+                  {sharing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
+                  Share
                 </button>
-              ))}
+                <button
+                  onClick={handleExportPdf}
+                  disabled={exporting || !form}
+                  className="glass flex items-center gap-1.5 rounded-lg border border-white/8 px-3 py-2 text-xs text-white/45 transition-all hover:bg-white/8 hover:text-white/80 disabled:opacity-50"
+                >
+                  {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                  Export PDF
+                </button>
+              </div>
+              {actionError && (
+                <p className="max-w-[220px] text-right text-[10px] text-red-400/90">{actionError}</p>
+              )}
             </div>
           </div>
 
