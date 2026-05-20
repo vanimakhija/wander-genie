@@ -201,7 +201,8 @@ You can also test it with the interactive API docs at: http://localhost:8000/doc
 ### Backend (`backend/.env`)
 | Variable | Default | Description |
 |---|---|---|
-| `OPENAI_API_KEY` | *(empty)* | Your OpenAI API key |
+| `GROQ_API_KEY` | *(empty)* | Your Groq API key (free Llama 3) |
+| `OPENWEATHER_API_KEY` | *(empty)* | OpenWeatherMap key for **live** weather on results |
 | `USE_MOCK` | `false` | `true` = always use mock data |
 
 ---

@@ -97,7 +97,9 @@ async def generate_with_ai(req) -> object:
     if use_mock or not api_key or api_key.startswith("gsk_your"):
         logger.warning(">>> USING MOCK DATA — Groq not called <<<")
         logger.warning("Check your .env file has a real GROQ_API_KEY")
-        return generate_mock(req)
+        result = generate_mock(req)
+        from weather_service import attach_live_weather
+        return await attach_live_weather(result, req.destination)
 
     logger.info(">>> CALLING GROQ LLAMA 3 for: %s (%d days) <<<", req.destination, req.duration)
 
@@ -143,11 +145,14 @@ async def generate_with_ai(req) -> object:
         data = json.loads(raw)
         result = _parse_response(data, req)
         logger.info(">>> Groq SUCCESS: %d days generated <<<", len(result.itinerary))
-        return result
+        from weather_service import attach_live_weather
+        return await attach_live_weather(result, req.destination)
 
     except Exception as e:
         logger.error(">>> Groq FAILED: %s — falling back to mock <<<", e, exc_info=True)
-        return generate_mock(req)
+        result = generate_mock(req)
+        from weather_service import attach_live_weather
+        return await attach_live_weather(result, req.destination)
 
 
 def _parse_response(data: dict, req) -> object:

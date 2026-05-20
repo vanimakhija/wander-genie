@@ -38,7 +38,9 @@ async def lifespan(app: FastAPI):
     use_mock = os.getenv("USE_MOCK", "false").lower() == "true"
     is_mock = use_mock or not api_key or api_key.startswith("gsk_your")
     mode = "MOCK (no real AI)" if is_mock else "Groq Llama 3 (FREE AI)"
-    logger.info("WanderGenie backend starting — mode: %s", mode)
+    weather_key = os.getenv("OPENWEATHER_API_KEY", "").strip()
+    weather_mode = "OpenWeather (live)" if weather_key else "AI/mock estimates"
+    logger.info("WanderGenie backend starting — mode: %s | weather: %s", mode, weather_mode)
     yield
     logger.info("WanderGenie backend stopped")
 
@@ -81,11 +83,13 @@ async def health_check():
     api_key = os.getenv("GROQ_API_KEY", "")
     use_mock = os.getenv("USE_MOCK", "false").lower() == "true"
     is_mock = use_mock or not api_key or api_key.startswith("gsk_your")
+    weather_key = os.getenv("OPENWEATHER_API_KEY", "").strip()
     return {
         "status": "ok",
         "service": "WanderGenie API",
         "version": "1.0.0",
         "mode": "mock" if is_mock else "groq-llama3",
+        "weather": "openweather" if weather_key else "ai-estimate",
         "message": "Backend is running! Open http://localhost:3000 for the app.",
     }
 
