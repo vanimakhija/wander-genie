@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { Globe, Sparkles } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Navbar() {
   return (
@@ -8,15 +8,14 @@ export default function Navbar() {
       <div className="mx-auto flex h-15 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{ height: '60px' }}>
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="relative">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-indigo-500 shadow-glow-brand">
-              <Globe className="h-4 w-4 text-white" strokeWidth={2} />
-            </div>
-            <Sparkles className="absolute -right-1 -top-1 h-3 w-3 text-yellow-300" />
-          </div>
-          <span className="font-[\'Playfair_Display\'] text-lg font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display)' }}>
-            Wander<span className="gradient-text">Genie</span>
-          </span>
+          <Image
+            src="/logo.png"
+            alt="WanderGenie Logo"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
         </Link>
 
         {/* Right side */}
