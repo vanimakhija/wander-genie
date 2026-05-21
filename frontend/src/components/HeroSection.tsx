@@ -6,15 +6,15 @@ export default function HeroSection() {
     <div className="mb-10 text-center sm:mb-14">
       {/* Logo */}
       <div className="animate-fade-up delay-100 mb-8 inline-flex items-center justify-center">
-        <div className="group relative h-32 w-32 transition-all duration-300 hover:scale-110">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-brand-400/20 to-indigo-500/20 blur-xl transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-brand-400/40 group-hover:to-indigo-500/40" />
-          <div className="relative flex h-full w-full items-center justify-center rounded-full border border-brand-400/30 bg-brand-500/5 backdrop-blur transition-all duration-300 group-hover:border-brand-400/60 group-hover:bg-brand-500/10">
+        <div className="group relative">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-brand-400/30 to-indigo-500/30 blur-2xl transition-all duration-300 group-hover:from-brand-400/50 group-hover:to-indigo-500/50 group-hover:blur-3xl h-40 w-40" />
+          <div className="relative overflow-hidden rounded-full border-2 border-brand-400/40 transition-all duration-300 group-hover:border-brand-400/70 group-hover:scale-110 h-40 w-40">
             <Image
               src="/logo.png"
               alt="WanderGenie Logo"
-              width={128}
-              height={128}
-              className="h-28 w-28 transition-transform duration-300 group-hover:scale-110"
+              width={160}
+              height={160}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
               priority
             />
           </div>
