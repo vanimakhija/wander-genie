@@ -6,6 +6,7 @@ import HeroSection from '@/components/HeroSection'
 import TripForm from '@/components/TripForm'
 import LoadingScreen from '@/components/LoadingScreen'
 import Footer from '@/components/Footer'
+import FeaturesSection from '@/components/FeaturesSection'
 import { generateItinerary, TRIP_STORAGE_KEY, FORM_STORAGE_KEY } from '@/lib/api'
 import { saveTrip } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
@@ -57,38 +58,53 @@ export default function HomePage() {
 
       <Navbar />
 
-      <main className="relative z-10 px-4 pb-16 pt-28 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl">
-          <HeroSection />
-          <TripForm onSubmit={handleSubmit} isLoading={loading} />
-
-          {error && (
-            <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center">
-              <p className="text-sm text-red-300">{error}</p>
+      <main className="relative z-10 px-4 pt-28 sm:px-6 lg:px-8">
+        {/* Hero Section with Form Side by Side */}
+        <div className="mx-auto max-w-7xl mb-20">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-center min-h-[700px]">
+            {/* Left: Hero Content - Centered */}
+            <div className="flex flex-col justify-center items-center">
+              <HeroSection />
             </div>
-          )}
 
-          {/* Sign in nudge for guests */}
-          {!user && (
-            <p className="mt-5 text-center text-xs text-white/25">
-              <a href="/login" className="text-brand-300 hover:text-brand-200 transition-colors">Sign in</a>
-              {' '}to save your trips and access them anytime
-            </p>
-          )}
+            {/* Right: Form */}
+            <div className="flex flex-col justify-start lg:sticky lg:top-32">
+              <div className="animate-fade-up delay-300">
+                <TripForm onSubmit={handleSubmit} isLoading={loading} />
 
-          {/* Popular destinations */}
-          <div className="animate-fade-up delay-700 mt-6 text-center">
-            <p className="mb-3 text-xs text-white/25">Popular destinations</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {['🌴 Goa', '🏝️ Bali', '🗼 Paris', '🗾 Tokyo', '🌊 Maldives', '🏔️ Manali'].map((d) => (
-                <span key={d} className="glass rounded-full border border-white/[.06] px-3 py-1.5 text-xs text-white/30">
-                  {d}
-                </span>
-              ))}
+                {error && (
+                  <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center">
+                    <p className="text-sm text-red-300">{error}</p>
+                  </div>
+                )}
+
+                {/* Sign in nudge for guests */}
+                {!user && (
+                  <p className="mt-5 text-center text-xs text-white/25">
+                    <a href="/login" className="text-brand-300 hover:text-brand-200 transition-colors">Sign in</a>
+                    {' '}to save your trips and access them anytime
+                  </p>
+                )}
+
+                {/* Popular destinations */}
+                <div className="animate-fade-up delay-400 mt-6">
+                  <p className="mb-3 text-xs text-white/25 text-center lg:text-left">Popular destinations</p>
+                  <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+                    {['🌴 Goa', '🏝️ Bali', '🗼 Paris', '🗾 Tokyo', '🌊 Maldives', '🏔️ Manali'].map((d) => (
+                      <span key={d} className="glass rounded-full border border-white/[.06] px-3 py-1.5 text-xs text-white/30">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Features Section */}
+      <FeaturesSection />
 
       <Footer />
     </div>
