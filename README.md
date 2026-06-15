@@ -1,233 +1,170 @@
-# 🌍 WanderGenie — Full-Stack AI Travel Planner
+# WanderGenie — AI Travel Planner
 
-AI-powered trip planner with a **Next.js frontend** and **FastAPI backend**.  
-Enter a destination + preferences → get a personalised itinerary + packing list.
+> Plan your perfect trip in seconds. Enter a destination and preferences, get a personalised day-by-day itinerary, weather-aware packing list, and shareable trip link — powered by LLaMA 3.
+
+**Live Demo → [wander-genie-indol.vercel.app](https://wander-genie-indol.vercel.app)**
+
+![WanderGenie Screenshot](./docs/screenshot.png)
 
 ---
 
-## 📁 Project Structure
+## What it does
+
+- Generates a detailed day-by-day itinerary with real place names, restaurants, and insider tips
+- Builds a smart packing list based on destination, travel month, and your interests (e.g. Goa in June = monsoon gear, not beach gear)
+- Shows real weather conditions for your destination in that specific month
+- Creates a shareable link for every trip so you can send it to friends
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14, React, TypeScript, Tailwind CSS |
+| Backend | Python 3.11, FastAPI, Uvicorn |
+| AI | Groq API — LLaMA 3.3 70B (free tier) |
+| Weather | OpenWeatherMap API |
+| Deployment | Vercel (frontend) + Render (backend) |
+
+---
+
+## Project Structure
 
 ```
-wander-genie-fullstack/
-├── frontend/          ← Next.js 14 · React · TypeScript · Tailwind CSS
+wander-genie/
+├── frontend/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── page.tsx          ← Home page (hero + form)
-│   │   │   ├── results/page.tsx  ← Results page
-│   │   │   ├── layout.tsx
-│   │   │   └── globals.css
+│   │   │   ├── page.tsx           ← Home page with trip form
+│   │   │   └── results/page.tsx   ← Itinerary results page
 │   │   ├── components/
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── TripForm.tsx
-│   │   │   ├── LoadingScreen.tsx
-│   │   │   ├── ItineraryCard.tsx
-│   │   │   ├── PackingList.tsx
-│   │   │   ├── WeatherCard.tsx
-│   │   │   └── Footer.tsx
+│   │   │   ├── TripForm.tsx       ← Main input form
+│   │   │   ├── ItineraryCard.tsx  ← Day-by-day itinerary display
+│   │   │   ├── PackingList.tsx    ← Smart packing list
+│   │   │   └── WeatherCard.tsx    ← Weather summary
 │   │   └── lib/
-│   │       ├── api.ts            ← API calls + fallback mock
-│   │       └── types.ts          ← Shared TypeScript types
-│   └── .env.local                ← Frontend env (points to backend)
+│   │       ├── api.ts             ← API calls to backend
+│   │       └── types.ts           ← TypeScript types
+│   └── .env.local
 │
-├── backend/           ← Python 3.11+ · FastAPI · OpenAI GPT-4o
-│   ├── main.py        ← FastAPI app + routes
-│   ├── ai_service.py  ← OpenAI GPT-4o integration
-│   ├── mock_data.py   ← Rich fallback data (no API key needed)
-│   ├── schemas.py     ← Pydantic request/response models
-│   ├── requirements.txt
-│   └── .env           ← Backend env (OpenAI key)
-│
-├── start.sh           ← One-command startup (Mac/Linux)
-├── start.bat          ← One-command startup (Windows)
-└── README.md
+├── backend/
+│   ├── main.py          ← FastAPI routes
+│   ├── ai_service.py    ← Groq LLaMA 3 integration
+│   ├── schemas.py       ← Pydantic models
+│   ├── mock_data.py     ← Fallback data (works without API key)
+│   └── requirements.txt
 ```
 
 ---
 
-## 🚀 Quick Start (Recommended)
+## Running Locally
 
-
-## WanderGenie AI Travel Planner
-##Built with Next.js and FastAPI
 ### Prerequisites
-- **Node.js 18+** — https://nodejs.org
-- **Python 3.11+** — https://python.org
+- Node.js 18+
+- Python 3.11+
 
-### Option A — One command (Mac / Linux)
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-### Option B — One command (Windows)
-```
-start.bat
-```
-
-Both scripts will install dependencies and start both servers automatically.
-
----
-
-## 🔧 Manual Setup (Step by Step)
-
-### Step 1 — Start the Backend
+### Backend
 
 ```bash
 cd backend
-
-# Create a Python virtual environment
 python -m venv venv
 
-# Activate it:
-#   Mac/Linux:
+# Mac/Linux
 source venv/bin/activate
-#   Windows:
+# Windows
 venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
-
-# Start the server
 uvicorn main:app --reload --port 8000
 ```
 
-You should see:
-```
-INFO  WanderGenie backend starting — mode: MOCK
-INFO  Uvicorn running on http://127.0.0.1:8000
-```
+Visit http://localhost:8000 — you should see `"status": "ok"`.
 
-Open http://localhost:8000 to confirm it says `"status": "ok"`.
+### Frontend
 
-### Step 2 — Start the Frontend
-
-Open a **new terminal** (keep the backend running).
+Open a new terminal:
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-Open http://localhost:3000 — the app is live!
+Visit http://localhost:3000 — the app is live.
 
 ---
 
-## 🤖 Connecting Real AI (OpenAI GPT-4o)
+## Environment Variables
 
-By default the app uses **built-in mock data** — no API key needed, everything works immediately.
+### Frontend — `frontend/.env.local`
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-To use real AI-generated itineraries:
-
-**1. Get an OpenAI API key:**
-- Go to https://platform.openai.com/api-keys
-- Create a new key
-
-**2. Add it to the backend:**
-```bash
-# Edit backend/.env
-OPENAI_API_KEY=sk-your-actual-key-here
+### Backend — `backend/.env`
+```
+GROQ_API_KEY=your_groq_key_here
+OPENWEATHER_API_KEY=your_openweather_key_here
 USE_MOCK=false
 ```
 
-**3. Restart the backend** — it will now call GPT-4o for every request.
+**Get free API keys:**
+- Groq (LLaMA 3, completely free) → https://console.groq.com
+- OpenWeatherMap (free tier) → https://openweathermap.org/api
 
-> 💡 **Cost estimate:** Each trip generation uses ~1 000–2 000 tokens ≈ $0.01–0.02 with GPT-4o.
+Without API keys, the app uses built-in mock data and still works fine.
 
 ---
 
-## 🌐 API Reference
+## API Reference
 
-### Health Check
+### Health check
 ```
-GET http://localhost:8000/
+GET /
 ```
 
-### Generate Itinerary
+### Generate itinerary
 ```
-POST http://localhost:8000/generate-itinerary
+POST /generate-itinerary
 Content-Type: application/json
 
 {
   "destination": "Goa",
   "budget": 20000,
   "duration": 5,
+  "travel_month": "June",
   "interests": ["beaches", "cafes", "nightlife"]
 }
 ```
 
-**Response:**
-```json
-{
-  "destination": "Goa",
-  "itinerary": [
-    {
-      "day": 1,
-      "title": "Arrival & First Impressions",
-      "activities": ["...", "...", "..."],
-      "meals": { "breakfast": "...", "lunch": "...", "dinner": "..." },
-      "tips": "..."
-    }
-  ],
-  "packing_list": [
-    { "name": "Clothing", "items": ["..."] },
-    { "name": "Essentials", "items": ["..."] }
-  ],
-  "weather": {
-    "temperature": "32°C",
-    "condition": "Sunny with coastal breeze",
-    "rainPrediction": "15% chance of light rain",
-    "suggestion": "...",
-    "humidity": "78%",
-    "icon": "sunny"
-  }
-}
-```
-
-You can also test it with the interactive API docs at: http://localhost:8000/docs
+Interactive API docs available at http://localhost:8000/docs
 
 ---
 
-## ⚙️ Environment Variables
+## Deployment
 
-### Frontend (`frontend/.env.local`)
-| Variable | Default | Description |
+| Service | Platform | URL |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | URL of the FastAPI backend |
-| `NEXT_PUBLIC_USE_MOCK` | `false` | `true` = use frontend mock (no backend needed) |
+| Frontend | Vercel | wander-genie-indol.vercel.app |
+| Backend | Render | wandergenie-backend-9xta.onrender.com |
 
-### Backend (`backend/.env`)
-| Variable | Default | Description |
-|---|---|---|
-| `GROQ_API_KEY` | *(empty)* | Your Groq API key (free Llama 3) |
-| `OPENWEATHER_API_KEY` | *(empty)* | OpenWeatherMap key for **live** weather on results |
-| `USE_MOCK` | `false` | `true` = always use mock data |
+To deploy your own instance, set `NEXT_PUBLIC_API_URL` in Vercel environment variables to your Render backend URL.
 
 ---
 
-## 🔥 Troubleshooting
+## Troubleshooting
 
 | Problem | Fix |
 |---|---|
-| `npm install` fails | Make sure Node.js 18+ is installed |
-| `pip install` fails | Make sure Python 3.11+ is installed and venv is activated |
-| Frontend shows "Backend unreachable" | Make sure `uvicorn` is running on port 8000 |
-| Empty results or errors | Check backend terminal for error logs |
-| Port 3000 already in use | Run `npm run dev -- --port 3001` and update `.env.local` |
+| Backend unreachable | Make sure uvicorn is running on port 8000 |
+| Empty results | Check backend logs for API key errors |
+| Port 3000 in use | Run `npm run dev -- --port 3001` |
+| Slow first response on Render | Free tier sleeps after inactivity — first request takes ~30s |
 
 ---
 
-## 🚢 Deployment
+## Author
 
-- **Frontend** → Deploy to [Vercel](https://vercel.com) (free tier works)
-- **Backend** → Deploy to [Render](https://render.com) or [Railway](https://railway.app) (free tier works)
-
-After deploying the backend, update `frontend/.env.local`:
-```
-NEXT_PUBLIC_API_URL=https://your-backend.onrender.com
-```
+**Vani Makhija** — Final Year Student  
+[GitHub](https://github.com/vanimakhija) · [Live Demo](https://wander-genie-indol.vercel.app)
