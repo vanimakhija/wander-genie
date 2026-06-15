@@ -56,13 +56,8 @@ app = FastAPI(
 # Allow the Next.js dev server to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        # Add your Vercel URL here when deploying:
-        # "https://your-app.vercel.app",
-    ],
+    allow_origins=["*"],
+   
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
